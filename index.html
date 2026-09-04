@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,11 +29,80 @@
         #3c3c3b 100%
       );
     }
+
+    /* ---------------------------------------------------------------
+       Custom zoom controls
+       --------------------------------------------------------------- */
+
+    #zoomControls {
+      position: absolute;
+      right: 15px;
+      bottom: 15px;
+      z-index: 1000;
+
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #zoomControls button {
+      width: 36px;
+      height: 36px;
+
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
+
+      background: rgba(40, 40, 40, 0.75);
+      color: white;
+
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      line-height: 36px;
+
+      padding: 0;
+      cursor: pointer;
+
+      box-sizing: border-box;
+    }
+
+    #zoomControls button:hover {
+      background: rgba(70, 70, 70, 0.9);
+    }
+
+    #zoomControls button:active {
+      background: rgba(20, 20, 20, 0.95);
+    }
+
+    /* Smaller text for the home button */
+
+    #zoomHome {
+      font-size: 16px !important;
+      margin-bottom: 4px;
+    }
+
   </style>
 </head>
 
 <body>
   <div id="cesiumContainer"></div>
+
+  <!-- ---------------------------------------------------------------
+       Custom zoom controls
+       --------------------------------------------------------------- -->
+
+  <div id="zoomControls">
+
+    <!-- Zoom to entire dataset -->
+    <button id="zoomHome" title="Zoom to dataset">⌂</button>
+
+    <!-- Zoom in -->
+    <button id="zoomIn" title="Zoom in">+</button>
+
+    <!-- Zoom out -->
+    <button id="zoomOut" title="Zoom out">−</button>
+
+  </div>
+
 
   <script>
 
@@ -73,9 +143,7 @@
       // Keep the normal Cesium attribution
       creditContainer: document.createElement('div'),
 
-      // --------------------------------------------------------------
-      // NEW: Allow the Cesium WebGL canvas to be transparent
-      // --------------------------------------------------------------
+      // Allow Cesium WebGL canvas to be transparent
       contextOptions: {
         webgl: {
           alpha: true
@@ -89,18 +157,15 @@
     // Remove Cesium globe / mapping / atmosphere
     // ------------------------------------------------------------------
 
-    // No globe behind the point cloud
     viewer.scene.globe.show = false;
 
-    // No atmospheric haze
     viewer.scene.skyAtmosphere.show = false;
 
-    // No Cesium sky box
     viewer.scene.skyBox.show = false;
 
 
     // ------------------------------------------------------------------
-    // NEW: Make the Cesium scene transparent
+    // Make the Cesium scene transparent
     // ------------------------------------------------------------------
 
     viewer.scene.backgroundColor =
@@ -147,16 +212,56 @@
 
         // Estimate of point spacing in metres
         tileset.pointCloudShading.baseResolution = 0.1;
-		
-		// Aims to alter spacing in point cloud at distance (i.e. point density)
-		tileset.maximumScreenSpaceError = 2;
+
+        // Load/refine more detailed tiles at distance
+        tileset.maximumScreenSpaceError = 2;
 
 
         // --------------------------------------------------------------
-        // Frame point cloud
+        // Frame point cloud initially
         // --------------------------------------------------------------
 
         await viewer.zoomTo(tileset);
+
+
+        // --------------------------------------------------------------
+        // Custom zoom controls
+        // --------------------------------------------------------------
+
+        // Zoom to entire dataset
+        document
+          .getElementById('zoomHome')
+          .addEventListener('click', function () {
+
+            viewer.zoomTo(tileset);
+
+          });
+
+
+        // Zoom in
+        document
+          .getElementById('zoomIn')
+          .addEventListener('click', function () {
+
+            const height =
+              viewer.camera.positionCartographic.height;
+
+            viewer.camera.zoomIn(height * 0.30);
+
+          });
+
+
+        // Zoom out
+        document
+          .getElementById('zoomOut')
+          .addEventListener('click', function () {
+
+            const height =
+              viewer.camera.positionCartographic.height;
+
+            viewer.camera.zoomOut(height * 0.30);
+
+          });
 
       }
 
@@ -181,3 +286,4 @@
   </script>
 </body>
 </html>
+```
