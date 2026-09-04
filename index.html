@@ -110,7 +110,7 @@
     // ------------------------------------------------------------------
 
     Cesium.Ion.defaultAccessToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IlFMYmMwM1licE5RaDY1Qi0iLCJqdGkiOiI2N2Q0NTM2NC01NjczLTQxMTQtODc1Yy1hN2FjMTNhZDM1M2QiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6Ik5lZWRsZXMtSW9XIiwiaWF0IjoxNzg4NTMyMjU0fQ.G_pYP7zm6255F-X7QyY8gwA30h3NrxF-HpjdS9CKDpE';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IlRaZlN0cnNYOGtUZUtkRTkiLCJqdGkiOiI2N2Q0NTM2NC01NjczLTQxMTQtODc1Yy1hN2FjMTNhZDM1M2QiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6Ik5lZWRsZXMtSW9XIiwiaWF0IjoxNzg4NTMyOTk4fQ.SWuCL88BaZke18fKFkwETSjmd_hAjlZliKyQZdOLf1o';
 
 
     // ------------------------------------------------------------------
@@ -126,29 +126,45 @@
 
     const viewer = new Cesium.Viewer('cesiumContainer', {
 
+      // --------------------------------------------------------------
+      // Remove standard Cesium UI
+      // --------------------------------------------------------------
+    
       timeline: false,
       animation: false,
-
-      // Don't load Cesium's default base imagery
-      baseLayer: false,
-
-      // Don't load terrain
-      terrain: undefined,
-
-      // Cleaner interface
+      geocoder: false,
+      homeButton: false,
       sceneModePicker: false,
       navigationHelpButton: false,
-
+      baseLayerPicker: false,
+      fullscreenButton: false,
+      vrButton: false,
+      infoBox: false,
+      selectionIndicator: false,
+    
+      // --------------------------------------------------------------
+      // No imagery or terrain
+      // --------------------------------------------------------------
+    
+      baseLayer: false,
+      terrain: undefined,
+    
+      // --------------------------------------------------------------
       // Keep the normal Cesium attribution
+      // --------------------------------------------------------------
+    
       creditContainer: document.createElement('div'),
-
+    
+      // --------------------------------------------------------------
       // Allow Cesium WebGL canvas to be transparent
+      // --------------------------------------------------------------
+    
       contextOptions: {
         webgl: {
           alpha: true
         }
       }
-
+    
     });
 
 
