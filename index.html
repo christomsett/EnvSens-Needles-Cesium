@@ -105,269 +105,283 @@
 
   <script>
 
-    // ------------------------------------------------------------------
-    // Cesium ion access token for the IoW Needles Dataset
-    // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Cesium ion access token
+  // ------------------------------------------------------------------
 
-    Cesium.Ion.defaultAccessToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjBQN29wN28zbzlLTGJoOEMiLCJqdGkiOiI0NmQyZTg5Yy1kNjM5LTQ3MTUtYjdhNy00ZTIyMTEzYjJmNjMiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6IklvVyBOZWVkbGVzIiwiaWF0IjoxNzg4NTMzODQ3fQ.MdmElXor3JRkyDPzSGLUTnM3BGZkcJyUAr3bJJxZPlU';
-
-
-    // ------------------------------------------------------------------
-    // Point cloud asset
-    // ------------------------------------------------------------------
-
-    const POINT_CLOUD_ASSET_ID = 5184080;
+  Cesium.Ion.defaultAccessToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjBQN29wN28zbzlLTGJoOEMiLCJqdGkiOiI0NmQyZTg5Yy1kNjM5LTQ3MTUtYjdhNy00ZTIyMTEzYjJmNjMiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6IklvVyBOZWVkbGVzIiwiaWF0IjoxNzg4NTMzODQ3fQ.MdmElXor3JRkyDPzSGLUTnM3BGZkcJyUAr3bJJxZPlU';
 
 
-    // ------------------------------------------------------------------
-    // Create viewer
-    // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Point cloud asset
+  // ------------------------------------------------------------------
 
-    const viewer = new Cesium.Viewer('cesiumContainer', {
+  const POINT_CLOUD_ASSET_ID = 5184080;
 
-      // --------------------------------------------------------------
-      // Remove standard Cesium UI
-      // --------------------------------------------------------------
-    
-      timeline: false,
-      animation: false,
-      geocoder: false,
-      homeButton: false,
-      sceneModePicker: false,
-      navigationHelpButton: false,
-      baseLayerPicker: false,
-      fullscreenButton: false,
-      vrButton: false,
-      infoBox: true,
-      selectionIndicator: false,
-    
-      // --------------------------------------------------------------
-      // No imagery or terrain
-      // --------------------------------------------------------------
-    
-      baseLayer: false,
-      terrain: undefined,
-    
-      // --------------------------------------------------------------
-      // Keep the normal Cesium attribution
-      // --------------------------------------------------------------
-    
-      creditContainer: document.createElement('div'),
-    
-      // --------------------------------------------------------------
-      // Allow Cesium WebGL canvas to be transparent
-      // --------------------------------------------------------------
-    
-      contextOptions: {
-        webgl: {
-          alpha: true
-        }
+
+  // ------------------------------------------------------------------
+  // Create viewer
+  // ------------------------------------------------------------------
+
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+
+    timeline: false,
+    animation: false,
+    geocoder: false,
+    homeButton: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    baseLayerPicker: false,
+    fullscreenButton: false,
+    vrButton: false,
+
+    // Enable InfoBox so POIs can display information
+    infoBox: true,
+
+    selectionIndicator: false,
+
+    baseLayer: false,
+    terrain: undefined,
+
+    creditContainer: document.createElement('div'),
+
+    contextOptions: {
+      webgl: {
+        alpha: true
       }
-    
-    });
+    }
+
+  });
 
 
-    // ------------------------------------------------------------------
-    // Remove Cesium globe / mapping / atmosphere
-    // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Remove Cesium globe / atmosphere
+  // ------------------------------------------------------------------
 
-    viewer.scene.globe.show = false;
+  viewer.scene.globe.show = false;
 
-    viewer.scene.skyAtmosphere.show = false;
+  viewer.scene.skyAtmosphere.show = false;
 
-    viewer.scene.skyBox.show = false;
+  viewer.scene.skyBox.show = false;
 
 
-    // ------------------------------------------------------------------
-    // Make the Cesium scene transparent
-    // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Transparent scene
+  // ------------------------------------------------------------------
 
-    viewer.scene.backgroundColor =
-      new Cesium.Color(
-        0.0,
-        0.0,
-        0.0,
-        0.0
+  viewer.scene.backgroundColor =
+    new Cesium.Color(
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    );
+
+
+  // ------------------------------------------------------------------
+  // Antialiasing
+  // ------------------------------------------------------------------
+
+  viewer.scene.postProcessStages.fxaa.enabled = true;
+
+
+  // ==================================================================
+  // LOAD POINT CLOUD
+  // ==================================================================
+
+  async function loadPointCloud() {
+
+    try {
+
+      const tileset =
+        await Cesium.Cesium3DTileset.fromIonAssetId(
+          POINT_CLOUD_ASSET_ID
+        );
+
+      viewer.scene.primitives.add(tileset);
+
+
+      // --------------------------------------------------------------
+      // Point-cloud rendering
+      // --------------------------------------------------------------
+
+      tileset.pointCloudShading.attenuation = true;
+
+      tileset.pointCloudShading.maximumAttenuation = 2;
+
+      tileset.pointCloudShading.baseResolution = 0.1;
+
+      tileset.maximumScreenSpaceError = 2;
+
+
+      // --------------------------------------------------------------
+      // Frame point cloud initially
+      // --------------------------------------------------------------
+
+      await viewer.zoomTo(tileset);
+
+
+      // --------------------------------------------------------------
+      // Custom zoom controls
+      // --------------------------------------------------------------
+
+      document
+        .getElementById('zoomHome')
+        .addEventListener('click', function () {
+
+          viewer.zoomTo(tileset);
+
+        });
+
+
+      document
+        .getElementById('zoomIn')
+        .addEventListener('click', function () {
+
+          const height =
+            viewer.camera.positionCartographic.height;
+
+          viewer.camera.zoomIn(height * 0.30);
+
+        });
+
+
+      document
+        .getElementById('zoomOut')
+        .addEventListener('click', function () {
+
+          const height =
+            viewer.camera.positionCartographic.height;
+
+          viewer.camera.zoomOut(height * 0.30);
+
+        });
+
+    }
+
+    catch (error) {
+
+      console.error(
+        'Error loading point cloud tileset:',
+        error
       );
 
+    }
 
-    // ------------------------------------------------------------------
-    // Antialiasing
-    // ------------------------------------------------------------------
-
-    viewer.scene.postProcessStages.fxaa.enabled = true;
+  }
 
 
-    // ------------------------------------------------------------------
-    // Load point cloud
-    // ------------------------------------------------------------------
+  // ==================================================================
+  // LOAD POI
+  // ==================================================================
 
-    async function loadPointCloud() {
-
-      try {
-
-        const tileset =
-          await Cesium.Cesium3DTileset.fromIonAssetId(
-            POINT_CLOUD_ASSET_ID
-          );
-
-        viewer.scene.primitives.add(tileset);
-
-
-        // --------------------------------------------------------------
-        // Point-cloud rendering
-        // --------------------------------------------------------------
-
-        // Enable distance-based point attenuation
-        tileset.pointCloudShading.attenuation = true;
-
-        // Maximum rendered point size
-        tileset.pointCloudShading.maximumAttenuation = 2;
-
-        // Estimate of point spacing in metres
-        tileset.pointCloudShading.baseResolution = 0.1;
-
-        // Load/refine more detailed tiles at distance
-        tileset.maximumScreenSpaceError = 2;
-
-
-        // --------------------------------------------------------------
-        // Frame point cloud initially
-        // --------------------------------------------------------------
-
-        await viewer.zoomTo(tileset);
-
-
-        // --------------------------------------------------------------
-        // Custom zoom controls
-        // --------------------------------------------------------------
-
-        // Zoom to entire dataset
-        document
-          .getElementById('zoomHome')
-          .addEventListener('click', function () {
-
-            viewer.zoomTo(tileset);
-
-          });
-
-
-        // Zoom in
-        document
-          .getElementById('zoomIn')
-          .addEventListener('click', function () {
-
-            const height =
-              viewer.camera.positionCartographic.height;
-
-            viewer.camera.zoomIn(height * 0.30);
-
-          });
-
-
-        // Zoom out
-        document
-          .getElementById('zoomOut')
-          .addEventListener('click', function () {
-
-            const height =
-              viewer.camera.positionCartographic.height;
-
-            viewer.camera.zoomOut(height * 0.30);
-
-          });
-
-      }
-
-  // ------------------------------------------------------------------
-  // Load clickable POI points
-  // ------------------------------------------------------------------
-  
   async function loadPOI() {
-  
+
     try {
-  
+
+      console.log('Loading POI.geojson...');
+
+
       const poiDataSource =
         await Cesium.GeoJsonDataSource.load(
           'POI.geojson',
           {
-            clampToGround: true
+            clampToGround: false
           }
         );
-  
+
+
       viewer.dataSources.add(poiDataSource);
-  
-  
+
+
+      console.log(
+        'POI loaded:',
+        poiDataSource.entities.values.length,
+        'points'
+      );
+
+
       // --------------------------------------------------------------
-      // Style and configure each POI
+      // Style each POI
       // --------------------------------------------------------------
-  
+
       for (const entity of poiDataSource.entities.values) {
-  
-        // Make sure the POI is displayed as a point
+
         entity.point = new Cesium.PointGraphics({
-  
-          pixelSize: 12,
-  
+
+          pixelSize: 14,
+
           color: Cesium.Color.YELLOW,
-  
+
           outlineColor: Cesium.Color.BLACK,
-  
-          outlineWidth: 2
-  
+
+          outlineWidth: 2,
+
+          disableDepthTestDistance:
+            Number.POSITIVE_INFINITY
+
         });
-  
-  
+
+
         // ------------------------------------------------------------
-        // Use attribute information in the Cesium InfoBox
+        // Get attribute values
         // ------------------------------------------------------------
-  
-        entity.name = 'Point of Interest';
-  
+
+        const category =
+          entity.properties.Category.getValue();
+
+        const description =
+          entity.properties.Des.getValue();
+
+
+        // ------------------------------------------------------------
+        // Name shown at top of InfoBox
+        // ------------------------------------------------------------
+
+        entity.name = category;
+
+
+        // ------------------------------------------------------------
+        // Information shown when clicked
+        // ------------------------------------------------------------
+
         entity.description = `
-          entity.description = `
-            <h3>${entity.properties.Category.getValue()}</h3>
+          <div style="font-family: Arial, sans-serif;">
+
+            <h3>${category}</h3>
 
             <p>
-              ${entity.properties.Des.getValue()}
+              ${description}
             </p>
-      `  ;
-  
+
+          </div>
+        `;
+
       }
-  
+
     }
 
-  catch (error) {
+    catch (error) {
 
-    console.error(
-      'Error loading POI GeoJSON:',
-      error
-    );
+      console.error(
+        'Error loading POI.geojson:',
+        error
+      );
+
+    }
 
   }
 
-}
-        
-      catch (error) {
 
-        console.error(
-          'Error loading point cloud tileset:',
-          error
-        );
+  // ==================================================================
+  // START
+  // ==================================================================
 
-      }
+  loadPointCloud();
 
-    }
+  loadPOI();
 
-
-    // ------------------------------------------------------------------
-    // Start
-    // ------------------------------------------------------------------
-
-    loadPointCloud();
-    loadPOI();
-
-  </script>
+</script>
 </body>
 </html>
