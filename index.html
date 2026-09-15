@@ -326,18 +326,13 @@
         entity.name = 'Point of Interest';
   
         entity.description = `
-          <table style="width:100%">
-            <tr>
-              <th align="left">Type</th>
-              <td>${entity.properties.Category}</td>
-            </tr>
-        
-            <tr>
-              <th align="left">Information</th>
-              <td>${entity.properties.Description}</td>
-            </tr>
-          </table>
-`;
+          entity.description = `
+            <h3>${entity.properties.Category.getValue()}</h3>
+
+            <p>
+              ${entity.properties.Des.getValue()}
+            </p>
+      `  ;
   
       }
   
