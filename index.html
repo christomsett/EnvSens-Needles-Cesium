@@ -1068,26 +1068,20 @@
                 POI_PIXEL_SIZE,
 
               color:
-                Cesium.Color.YELLOW,
+                Cesium.Color.fromCssColorString('#e76141'),
 
               outlineColor:
-                Cesium.Color.BLACK,
+                Cesium.Color.fromCssColorString('#3b3b3c'),
 
               outlineWidth: 2,
-
-
-              // --------------------------------------------------
-              // IMPORTANT:
-              //
-              // Normal depth testing means the point cloud can
-              // hide the yellow point when it is physically behind
-              // the cloud.
-              // --------------------------------------------------
 
               disableDepthTestDistance: 0
 
             });
 
+            // Remove Cesium's default GeoJSON marker (the blue pin/box you're seeing)
+            entity.billboard = undefined;
+            entity.label = undefined;
 
           // ------------------------------------------------------
           // Give entity a useful name
