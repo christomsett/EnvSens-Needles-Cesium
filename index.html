@@ -12,6 +12,11 @@
   />
 
   <style>
+
+    /* ============================================================
+       PAGE / CESIUM
+       ============================================================ */
+
     html,
     body,
     #cesiumContainer {
@@ -31,11 +36,17 @@
       );
     }
 
+
+    /* ============================================================
+       ZOOM CONTROLS
+       ============================================================ */
+
     #zoomControls {
       position: absolute;
       right: 15px;
       bottom: 15px;
       z-index: 1000;
+
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -44,15 +55,20 @@
     #zoomControls button {
       width: 36px;
       height: 36px;
+
       border: 1px solid rgba(255, 255, 255, 0.35);
       border-radius: 4px;
+
       background: rgba(40, 40, 40, 0.75);
       color: white;
+
       font-family: Arial, sans-serif;
       font-size: 22px;
       line-height: 36px;
+
       padding: 0;
       cursor: pointer;
+
       box-sizing: border-box;
     }
 
@@ -68,70 +84,320 @@
       font-size: 16px !important;
       margin-bottom: 4px;
     }
+
+
+    /* ============================================================
+       CUSTOM POI POPUP
+       ============================================================ */
+
+    #poiPopup {
+      position: absolute;
+
+      display: none;
+
+      z-index: 2000;
+
+      width: 320px;
+      max-width: calc(100vw - 40px);
+
+      background: rgba(255, 255, 255, 0.97);
+
+      border-radius: 8px;
+
+      box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.30);
+
+      font-family: Arial, sans-serif;
+
+      color: #333;
+
+      box-sizing: border-box;
+
+      pointer-events: auto;
+    }
+
+
+    /* Popup header */
+
+    #poiPopupHeader {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 12px 14px;
+
+      border-bottom: 1px solid #dddddd;
+
+      background: #f5f5f5;
+
+      border-radius:
+        8px 8px 0 0;
+    }
+
+
+    /* Popup title */
+
+    #poiPopupTitle {
+      margin: 0;
+
+      padding: 0;
+
+      font-size: 17px;
+
+      font-weight: 600;
+
+      color: #333;
+
+      line-height: 1.3;
+    }
+
+
+    /* Close button */
+
+    #poiPopupClose {
+      border: none;
+
+      background: transparent;
+
+      color: #777;
+
+      font-size: 22px;
+
+      line-height: 20px;
+
+      width: 24px;
+      height: 24px;
+
+      padding: 0;
+
+      cursor: pointer;
+    }
+
+    #poiPopupClose:hover {
+      color: #222;
+    }
+
+
+    /* Popup body */
+
+    #poiPopupBody {
+      padding: 14px;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+      color: #444;
+    }
+
+    #poiPopupBody p {
+      margin: 0;
+    }
+
+
+    /* Small pointer underneath popup */
+
+    #poiPopupArrow {
+      position: absolute;
+
+      left: 50%;
+
+      bottom: -8px;
+
+      transform: translateX(-50%);
+
+      width: 0;
+      height: 0;
+
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+
+      border-top: 8px solid rgba(255, 255, 255, 0.97);
+    }
+
   </style>
 </head>
 
+
 <body>
+
+
+  <!-- ==========================================================
+       CESIUM CONTAINER
+       ========================================================== -->
 
   <div id="cesiumContainer"></div>
 
+
+  <!-- ==========================================================
+       ZOOM CONTROLS
+       ========================================================== -->
+
   <div id="zoomControls">
-    <button id="zoomHome" title="Zoom to dataset">⌂</button>
-    <button id="zoomIn" title="Zoom in">+</button>
-    <button id="zoomOut" title="Zoom out">−</button>
+
+    <button
+      id="zoomHome"
+      title="Zoom to dataset"
+    >
+      ⌂
+    </button>
+
+    <button
+      id="zoomIn"
+      title="Zoom in"
+    >
+      +
+    </button>
+
+    <button
+      id="zoomOut"
+      title="Zoom out"
+    >
+      −
+    </button>
+
   </div>
 
+
+  <!-- ==========================================================
+       CUSTOM POI POPUP
+       ========================================================== -->
+
+  <div id="poiPopup">
+
+    <div id="poiPopupHeader">
+
+      <h3 id="poiPopupTitle">
+        Point of Interest
+      </h3>
+
+      <button
+        id="poiPopupClose"
+        title="Close"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="poiPopupBody">
+
+      <p id="poiPopupDescription"></p>
+
+    </div>
+
+    <div id="poiPopupArrow"></div>
+
+  </div>
+
+
   <script>
+
 
     // ============================================================
     // CESIUM ION
     // ============================================================
 
     Cesium.Ion.defaultAccessToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjBQN29wN28zbzlLTGJoOEMiLCJqdGkiOiI0NmQyZTg5Yy1kNjM5LTQ3MTUtYjdhNy00ZTIyMTEzYjJmNjMiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6IklvVyBOZWVkbGVzIiwiaWF0IjoxNzg4NTMzODQ3fQ.MdmElXor3JRkyDPzSGLUTnM3BGZkcJyUAr3bJJxZPlU';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjBQN29wN28zbzlLTGJoOEMiLCJqdGkiOiI0NmQyZTg5Yy1kNjM5LTQ3MTUtYjdhNy00ZTIyMTEzYjJmNjMiLCJpZCI6NDgwNjc5LCJzdWIiOiJlc2FzX3NvdG9uIiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6IklvVyBOZWVkbGVzIiwiaWF0IjoxNzg4NTMzODQ3fQ.MdmElXor3JRkyDPzSGLUTnM3BGZkcJyUAr3bJJxZPlU';
+
 
     const POINT_CLOUD_ASSET_ID = 5184080;
 
 
     // ============================================================
-    // GLOBAL POINT CLOUD VARIABLE
+    // POI SETTINGS
     // ============================================================
 
-    let tileset;
+    // Height above the point-cloud surface, in metres.
+
+    // Examples:
+    //
+    // 0.0 = directly on the point cloud
+    // 1.0 = 1 metre above
+    // 2.0 = 2 metres above
+    // 5.0 = 5 metres above
+
+    const POI_HEIGHT_OFFSET = 2.0;
+
+
+    // Size of yellow POI markers.
+
+    const POI_PIXEL_SIZE = 14;
 
 
     // ============================================================
-    // CREATE VIEWER
+    // GLOBAL VARIABLES
     // ============================================================
 
-    const viewer = new Cesium.Viewer('cesiumContainer', {
+    let tileset = null;
 
-      timeline: false,
-      animation: false,
-      geocoder: false,
-      homeButton: false,
-      sceneModePicker: false,
-      navigationHelpButton: false,
-      baseLayerPicker: false,
-      fullscreenButton: false,
-      vrButton: false,
+    let selectedPOI = null;
 
-      infoBox: true,
 
-      // Disable Cesium's blue selection indicator
-      selectionIndicator: false,
+    // ============================================================
+    // CREATE CESIUM VIEWER
+    // ============================================================
 
-      baseLayer: false,
-      terrain: undefined,
+    const viewer = new Cesium.Viewer(
+      'cesiumContainer',
+      {
 
-      creditContainer: document.createElement('div'),
+        timeline: false,
 
-      contextOptions: {
-        webgl: {
-          alpha: true
+        animation: false,
+
+        geocoder: false,
+
+        homeButton: false,
+
+        sceneModePicker: false,
+
+        navigationHelpButton: false,
+
+        baseLayerPicker: false,
+
+        fullscreenButton: false,
+
+        vrButton: false,
+
+
+        // --------------------------------------------------------
+        // Disable Cesium's standard blue InfoBox
+        // --------------------------------------------------------
+
+        infoBox: false,
+
+
+        // --------------------------------------------------------
+        // Disable Cesium selection indicator
+        // --------------------------------------------------------
+
+        selectionIndicator: false,
+
+
+        baseLayer: false,
+
+        terrain: undefined,
+
+
+        creditContainer:
+          document.createElement('div'),
+
+
+        contextOptions: {
+
+          webgl: {
+
+            alpha: true
+
+          }
+
         }
+
       }
-    });
+    );
 
 
     // ============================================================
@@ -139,8 +405,11 @@
     // ============================================================
 
     viewer.scene.globe.show = false;
+
     viewer.scene.skyAtmosphere.show = false;
+
     viewer.scene.skyBox.show = false;
+
 
     viewer.scene.backgroundColor =
       new Cesium.Color(
@@ -150,7 +419,304 @@
         0.0
       );
 
-    viewer.scene.postProcessStages.fxaa.enabled = true;
+
+    viewer.scene.postProcessStages
+      .fxaa.enabled = true;
+
+
+    // ============================================================
+    // POPUP ELEMENTS
+    // ============================================================
+
+    const poiPopup =
+      document.getElementById(
+        'poiPopup'
+      );
+
+
+    const poiPopupTitle =
+      document.getElementById(
+        'poiPopupTitle'
+      );
+
+
+    const poiPopupDescription =
+      document.getElementById(
+        'poiPopupDescription'
+      );
+
+
+    const poiPopupClose =
+      document.getElementById(
+        'poiPopupClose'
+      );
+
+
+    // ============================================================
+    // CLOSE POI POPUP
+    // ============================================================
+
+    function closePOIPopup() {
+
+      poiPopup.style.display =
+        'none';
+
+      selectedPOI = null;
+
+    }
+
+
+    // ============================================================
+    // CLOSE BUTTON
+    // ============================================================
+
+    poiPopupClose.addEventListener(
+      'click',
+      function () {
+
+        closePOIPopup();
+
+      }
+    );
+
+
+    // ============================================================
+    // SHOW POI POPUP
+    // ============================================================
+
+    function showPOIPopup(entity) {
+
+      if (!entity) {
+
+        closePOIPopup();
+
+        return;
+
+      }
+
+
+      // ----------------------------------------------------------
+      // Store selected entity
+      // ----------------------------------------------------------
+
+      selectedPOI = entity;
+
+
+      // ----------------------------------------------------------
+      // Get attributes
+      // ----------------------------------------------------------
+
+      let category = '';
+
+      let description = '';
+
+
+      if (
+        entity.properties &&
+        entity.properties.Category
+      ) {
+
+        category =
+          entity.properties.Category
+            .getValue();
+
+      }
+
+
+      if (
+        entity.properties &&
+        entity.properties.Des
+      ) {
+
+        description =
+          entity.properties.Des
+            .getValue();
+
+      }
+
+
+      // ----------------------------------------------------------
+      // Populate popup
+      // ----------------------------------------------------------
+
+      poiPopupTitle.textContent =
+        category || 'Point of Interest';
+
+
+      poiPopupDescription.textContent =
+        description || '';
+
+
+      // ----------------------------------------------------------
+      // Make popup visible
+      // ----------------------------------------------------------
+
+      poiPopup.style.display =
+        'block';
+
+
+      // ----------------------------------------------------------
+      // Position popup
+      // ----------------------------------------------------------
+
+      updatePOIPopupPosition();
+
+    }
+
+
+    // ============================================================
+    // UPDATE POPUP POSITION
+    // ============================================================
+
+    function updatePOIPopupPosition() {
+
+      if (!selectedPOI) {
+
+        return;
+
+      }
+
+
+      if (!selectedPOI.position) {
+
+        closePOIPopup();
+
+        return;
+
+      }
+
+
+      const position =
+        selectedPOI.position.getValue(
+          Cesium.JulianDate.now()
+        );
+
+
+      if (!Cesium.defined(position)) {
+
+        closePOIPopup();
+
+        return;
+
+      }
+
+
+      // ----------------------------------------------------------
+      // Convert 3D position to screen position
+      // ----------------------------------------------------------
+
+      const windowPosition =
+        Cesium.SceneTransforms
+          .worldToWindowCoordinates(
+            viewer.scene,
+            position
+          );
+
+
+      if (!Cesium.defined(windowPosition)) {
+
+        poiPopup.style.display =
+          'none';
+
+        return;
+
+      }
+
+
+      // ----------------------------------------------------------
+      // Make sure popup is visible before measuring it
+      // ----------------------------------------------------------
+
+      poiPopup.style.display =
+        'block';
+
+
+      const popupWidth =
+        poiPopup.offsetWidth;
+
+
+      const popupHeight =
+        poiPopup.offsetHeight;
+
+
+      // ----------------------------------------------------------
+      // Position popup above POI
+      // ----------------------------------------------------------
+
+      let left =
+        windowPosition.x -
+        popupWidth / 2;
+
+
+      let top =
+        windowPosition.y -
+        popupHeight -
+        20;
+
+
+      // ----------------------------------------------------------
+      // Keep popup inside browser window
+      // ----------------------------------------------------------
+
+      const margin = 10;
+
+
+      if (left < margin) {
+
+        left = margin;
+
+      }
+
+
+      if (
+        left + popupWidth >
+        window.innerWidth - margin
+      ) {
+
+        left =
+          window.innerWidth -
+          popupWidth -
+          margin;
+
+      }
+
+
+      if (top < margin) {
+
+        top = margin;
+
+      }
+
+
+      // ----------------------------------------------------------
+      // Apply screen position
+      // ----------------------------------------------------------
+
+      poiPopup.style.left =
+        `${left}px`;
+
+
+      poiPopup.style.top =
+        `${top}px`;
+
+    }
+
+
+    // ============================================================
+    // UPDATE POPUP WHEN CAMERA MOVES
+    // ============================================================
+
+    viewer.scene.postRender.addEventListener(
+      function () {
+
+        if (selectedPOI) {
+
+          updatePOIPopupPosition();
+
+        }
+
+      }
+    );
 
 
     // ============================================================
@@ -161,37 +727,56 @@
 
       try {
 
-        console.log("Loading point cloud...");
+        console.log(
+          'Loading point cloud...'
+        );
+
 
         tileset =
-          await Cesium.Cesium3DTileset.fromIonAssetId(
-            POINT_CLOUD_ASSET_ID
-          );
+          await Cesium
+            .Cesium3DTileset
+            .fromIonAssetId(
+              POINT_CLOUD_ASSET_ID
+            );
 
-        viewer.scene.primitives.add(tileset);
+
+        viewer.scene.primitives.add(
+          tileset
+        );
 
 
         // --------------------------------------------------------
         // Point cloud appearance
         // --------------------------------------------------------
 
-        tileset.pointCloudShading.attenuation = true;
-
-        tileset.pointCloudShading.maximumAttenuation = 2;
-
-        tileset.pointCloudShading.baseResolution = 0.1;
-
-        tileset.maximumScreenSpaceError = 2;
+        tileset.pointCloudShading
+          .attenuation = true;
 
 
-        console.log("Point cloud loaded.");
+        tileset.pointCloudShading
+          .maximumAttenuation = 2;
+
+
+        tileset.pointCloudShading
+          .baseResolution = 0.1;
+
+
+        tileset.maximumScreenSpaceError =
+          2;
+
+
+        console.log(
+          'Point cloud loaded.'
+        );
 
 
         // --------------------------------------------------------
         // Zoom to point cloud
         // --------------------------------------------------------
 
-        await viewer.zoomTo(tileset);
+        await viewer.zoomTo(
+          tileset
+        );
 
 
         // --------------------------------------------------------
@@ -199,12 +784,19 @@
         // --------------------------------------------------------
 
         document
-          .getElementById('zoomHome')
-          .addEventListener('click', function () {
+          .getElementById(
+            'zoomHome'
+          )
+          .addEventListener(
+            'click',
+            function () {
 
-            viewer.zoomTo(tileset);
+              viewer.zoomTo(
+                tileset
+              );
 
-          });
+            }
+          );
 
 
         // --------------------------------------------------------
@@ -212,15 +804,25 @@
         // --------------------------------------------------------
 
         document
-          .getElementById('zoomIn')
-          .addEventListener('click', function () {
+          .getElementById(
+            'zoomIn'
+          )
+          .addEventListener(
+            'click',
+            function () {
 
-            const height =
-              viewer.camera.positionCartographic.height;
+              const height =
+                viewer.camera
+                  .positionCartographic
+                  .height;
 
-            viewer.camera.zoomIn(height * 0.30);
 
-          });
+              viewer.camera.zoomIn(
+                height * 0.30
+              );
+
+            }
+          );
 
 
         // --------------------------------------------------------
@@ -228,22 +830,32 @@
         // --------------------------------------------------------
 
         document
-          .getElementById('zoomOut')
-          .addEventListener('click', function () {
+          .getElementById(
+            'zoomOut'
+          )
+          .addEventListener(
+            'click',
+            function () {
 
-            const height =
-              viewer.camera.positionCartographic.height;
+              const height =
+                viewer.camera
+                  .positionCartographic
+                  .height;
 
-            viewer.camera.zoomOut(height * 0.30);
 
-          });
+              viewer.camera.zoomOut(
+                height * 0.30
+              );
+
+            }
+          );
 
       }
 
       catch (error) {
 
         console.error(
-          "Error loading point cloud tileset:",
+          'Error loading point cloud:',
           error
         );
 
@@ -253,56 +865,64 @@
 
 
     // ============================================================
-    // LOAD POINTS OF INTEREST
+    // LOAD POIs
     // ============================================================
 
     async function loadPOI() {
 
       try {
 
-        console.log("Loading POI.geojson...");
+        console.log(
+          'Loading POI.geojson...'
+        );
 
 
         // --------------------------------------------------------
         // Load GeoJSON
         //
         // IMPORTANT:
-        // POI.geojson should be EPSG:4326 / WGS84.
-        //
-        // We deliberately DO NOT use clampToGround here.
+        // POI.geojson must be EPSG:4326 / WGS84.
         // --------------------------------------------------------
 
         const poiDataSource =
-          await Cesium.GeoJsonDataSource.load(
-            'POI.geojson',
-            {
-              clampToGround: false
-            }
-          );
+          await Cesium
+            .GeoJsonDataSource
+            .load(
+              'POI.geojson',
+              {
+
+                clampToGround: false
+
+              }
+            );
 
 
-        viewer.dataSources.add(poiDataSource);
+        viewer.dataSources.add(
+          poiDataSource
+        );
 
 
         const entities =
-          poiDataSource.entities.values;
+          poiDataSource
+            .entities
+            .values;
 
 
         console.log(
-          "POI loaded:",
+          'POI loaded:',
           entities.length,
-          "points"
+          'points'
         );
 
 
         // --------------------------------------------------------
-        // Make sure the point cloud is available
+        // Make sure point cloud exists
         // --------------------------------------------------------
 
         if (!tileset) {
 
           console.warn(
-            "Point cloud is not available yet."
+            'Point cloud is not available.'
           );
 
           return;
@@ -310,15 +930,11 @@
         }
 
 
-        // --------------------------------------------------------
-        // Wait for point cloud
-        // --------------------------------------------------------
-
         await tileset.readyPromise;
 
 
         console.log(
-          "Clamping POIs to point cloud..."
+          'Clamping POIs to point cloud...'
         );
 
 
@@ -327,10 +943,13 @@
         // --------------------------------------------------------
 
         const positions = [];
+
         const validEntities = [];
 
 
-        for (const entity of entities) {
+        for (
+          const entity of entities
+        ) {
 
           const position =
             entity.position.getValue(
@@ -338,38 +957,38 @@
             );
 
 
-          if (Cesium.defined(position)) {
+          if (
+            Cesium.defined(position)
+          ) {
 
-            positions.push(position);
-            validEntities.push(entity);
+            positions.push(
+              position
+            );
+
+            validEntities.push(
+              entity
+            );
 
           }
 
         }
 
 
-        console.log(
-          "Valid POI positions:",
-          positions.length
-        );
-
-
         // --------------------------------------------------------
-        // Clamp to the 3D Tiles point cloud
-        //
-        // This is NOT terrain clamping.
+        // Clamp to point cloud
         // --------------------------------------------------------
 
         const clampedPositions =
-          await viewer.scene.clampToHeightMostDetailed(
-            positions,
-            [],
-            0.5
-          );
+          await viewer.scene
+            .clampToHeightMostDetailed(
+              positions,
+              [],
+              0.5
+            );
 
 
         // --------------------------------------------------------
-        // Apply the clamped positions
+        // Process each POI
         // --------------------------------------------------------
 
         for (
@@ -380,6 +999,7 @@
 
           const entity =
             validEntities[i];
+
 
           const clampedPosition =
             clampedPositions[i];
@@ -392,7 +1012,7 @@
           ) {
 
             console.warn(
-              "Could not clamp POI:",
+              'Could not clamp POI:',
               entity.name
             );
 
@@ -402,29 +1022,50 @@
 
 
           // ------------------------------------------------------
-          // Move POI onto LiDAR surface
+          // Convert to Cartographic
           // ------------------------------------------------------
+
+          const cartographic =
+            Cesium.Cartographic
+              .fromCartesian(
+                clampedPosition
+              );
+
+
+          // ------------------------------------------------------
+          // Add height offset
+          // ------------------------------------------------------
+
+          cartographic.height +=
+            POI_HEIGHT_OFFSET;
+
+
+          // ------------------------------------------------------
+          // Convert back to Cartesian
+          // ------------------------------------------------------
+
+          const floatingPosition =
+            Cesium.Cartesian3
+              .fromRadians(
+                cartographic.longitude,
+                cartographic.latitude,
+                cartographic.height
+              );
+
 
           entity.position =
-            clampedPosition;
+            floatingPosition;
 
 
           // ------------------------------------------------------
-          // Yellow POI marker
-          //
-          // IMPORTANT:
-          //
-          // No disableDepthTestDistance:
-          // Number.POSITIVE_INFINITY
-          //
-          // Therefore the point can be hidden by
-          // the point cloud.
+          // Yellow point
           // ------------------------------------------------------
 
           entity.point =
             new Cesium.PointGraphics({
 
-              pixelSize: 14,
+              pixelSize:
+                POI_PIXEL_SIZE,
 
               color:
                 Cesium.Color.YELLOW,
@@ -434,65 +1075,48 @@
 
               outlineWidth: 2,
 
-              // Enable normal depth testing
+
+              // --------------------------------------------------
+              // IMPORTANT:
+              //
+              // Normal depth testing means the point cloud can
+              // hide the yellow point when it is physically behind
+              // the cloud.
+              // --------------------------------------------------
+
               disableDepthTestDistance: 0
 
             });
 
 
           // ------------------------------------------------------
-          // Read attribute information
+          // Give entity a useful name
           // ------------------------------------------------------
 
-          const category =
-            entity.properties.Category.getValue();
+          if (
+            entity.properties &&
+            entity.properties.Category
+          ) {
 
-          const description =
-            entity.properties.Des.getValue();
+            entity.name =
+              entity.properties
+                .Category
+                .getValue();
 
-
-          // ------------------------------------------------------
-          // Entity name
-          // ------------------------------------------------------
-
-          entity.name = category;
-
-
-          // ------------------------------------------------------
-          // Information displayed when clicked
-          // ------------------------------------------------------
-
-          entity.description = `
-
-            <div
-              style="
-                font-family: Arial, sans-serif;
-                max-width: 350px;
-              "
-            >
-
-              <h3
-                style="
-                  margin-top: 0;
-                  margin-bottom: 10px;
-                "
-              >
-                ${category}
-              </h3>
-
-              <p>
-                ${description}
-              </p>
-
-            </div>
-
-          `;
+          }
 
         }
 
 
         console.log(
-          "POIs successfully clamped to point cloud."
+          'POIs positioned successfully.'
+        );
+
+
+        console.log(
+          'POI height offset:',
+          POI_HEIGHT_OFFSET,
+          'metres'
         );
 
       }
@@ -500,7 +1124,7 @@
       catch (error) {
 
         console.error(
-          "Error loading/clamping POI.geojson:",
+          'Error loading POI.geojson:',
           error
         );
 
@@ -510,15 +1134,94 @@
 
 
     // ============================================================
+    // MOUSE CLICK HANDLER
+    // ============================================================
+
+    const clickHandler =
+      new Cesium.ScreenSpaceEventHandler(
+        viewer.scene.canvas
+      );
+
+
+    clickHandler.setInputAction(
+      function (movement) {
+
+
+        // --------------------------------------------------------
+        // Pick whatever is underneath the mouse
+        // --------------------------------------------------------
+
+        const pickedObject =
+          viewer.scene.pick(
+            movement.position
+          );
+
+
+        // --------------------------------------------------------
+        // Check whether we clicked a POI
+        // --------------------------------------------------------
+
+        if (
+          Cesium.defined(
+            pickedObject
+          ) &&
+          pickedObject.id
+        ) {
+
+          const entity =
+            pickedObject.id;
+
+
+          // ------------------------------------------------------
+          // Check that this is one of our POIs
+          // ------------------------------------------------------
+
+          if (
+            entity.point &&
+            entity.properties
+          ) {
+
+            showPOIPopup(
+              entity
+            );
+
+            return;
+
+          }
+
+        }
+
+
+        // --------------------------------------------------------
+        // Clicked somewhere else:
+        // close popup
+        // --------------------------------------------------------
+
+        closePOIPopup();
+
+      },
+      Cesium.ScreenSpaceEventType.LEFT_CLICK
+    );
+
+
+    // ============================================================
     // INITIALISE VIEWER
     // ============================================================
 
     async function initialiseViewer() {
 
+
+      // ----------------------------------------------------------
       // Load point cloud first
+      // ----------------------------------------------------------
+
       await loadPointCloud();
 
-      // Then load POIs and clamp them to the point cloud
+
+      // ----------------------------------------------------------
+      // Then load POIs
+      // ----------------------------------------------------------
+
       await loadPOI();
 
     }
@@ -530,8 +1233,8 @@
 
     initialiseViewer();
 
+
   </script>
 
 </body>
 </html>
-
