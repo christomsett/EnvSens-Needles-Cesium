@@ -139,7 +139,7 @@
       baseLayerPicker: false,
       fullscreenButton: false,
       vrButton: false,
-      infoBox: false,
+      infoBox: true,
       selectionIndicator: false,
     
       // --------------------------------------------------------------
@@ -280,6 +280,80 @@
 
       }
 
+  // ------------------------------------------------------------------
+  // Load clickable POI points
+  // ------------------------------------------------------------------
+  
+  async function loadPOI() {
+  
+    try {
+  
+      const poiDataSource =
+        await Cesium.GeoJsonDataSource.load(
+          'POI.geojson',
+          {
+            clampToGround: true
+          }
+        );
+  
+      viewer.dataSources.add(poiDataSource);
+  
+  
+      // --------------------------------------------------------------
+      // Style and configure each POI
+      // --------------------------------------------------------------
+  
+      for (const entity of poiDataSource.entities.values) {
+  
+        // Make sure the POI is displayed as a point
+        entity.point = new Cesium.PointGraphics({
+  
+          pixelSize: 12,
+  
+          color: Cesium.Color.YELLOW,
+  
+          outlineColor: Cesium.Color.BLACK,
+  
+          outlineWidth: 2
+  
+        });
+  
+  
+        // ------------------------------------------------------------
+        // Use attribute information in the Cesium InfoBox
+        // ------------------------------------------------------------
+  
+        entity.name = 'Point of Interest';
+  
+        entity.description = `
+          <table style="width:100%">
+            <tr>
+              <th align="left">Type</th>
+              <td>${entity.properties.Category}</td>
+            </tr>
+        
+            <tr>
+              <th align="left">Information</th>
+              <td>${entity.properties.Description}</td>
+            </tr>
+          </table>
+`;
+  
+      }
+  
+    }
+
+  catch (error) {
+
+    console.error(
+      'Error loading POI GeoJSON:',
+      error
+    );
+
+  }
+
+}
+        
       catch (error) {
 
         console.error(
@@ -297,6 +371,7 @@
     // ------------------------------------------------------------------
 
     loadPointCloud();
+    loadPOI();
 
   </script>
 </body>
